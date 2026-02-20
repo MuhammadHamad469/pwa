@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>My PWA</title>
+  <link rel="manifest" href="manifest.json">
+  <style>
+    /* Center Modal Popup */
+    #installModal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.7);
+      z-index: 9999;
+      justify-content: center;
+      align-items: center;
+    }
+    #installBox {
+      background: white;
+      padding: 30px;
+      border-radius: 16px;
+      text-align: center;
+      max-width: 300px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      animation: pop 0.3s ease-out;
+    }
+    @keyframes pop {
+      from { transform: scale(0.8); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    #installBtn {
+      background: #007bff;
+      color: white;
+      border: none;
+      padding: 12px 30px;
+      font-size: 18px;
+      border-radius: 8px;
+      margin-top: 15px;
+      cursor: pointer;
+    }
+    .closeBtn {
+      background: none;
+      border: none;
+      font-size: 28px;
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      cursor: pointer;
+      color: #999;
+    }
+  </style>
+</head>
+<body>
+  <h1>Hello PWA</h1>
+  <p>Open on your phone → you will see a beautiful center popup!</p>
+
+  <!-- Center Modal Install Popup -->
+  <div id="installModal">
+    <div id="installBox">
+      <button class="closeBtn" onclick="document.getElementById('installModal').style.display='none'">×</button>
+      <img src="/download.jpeg" width="80" height="80" style="border-radius:12px; margin-bottom:15px;">
+      <h3>Install My PWA</h3>
+      <p>Add this app to your home screen?</p>
+      <button id="installBtn">Install App</button>
+    </div>
+  </div>
+
+  <script>
+    let deferredPrompt;
+
+    // Register Service Worker
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("service-worker.js");
+    }
+
+    // When browser is ready to show install prompt
+    window.addEventListener("beforeinstallprompt", (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      document.getElementById("installModal").style.display = "flex"; // Show center modal
+    });
+
+    // Install button
+    document.getElementById("installBtn").addEventListener("click", () => {
+      document.getElementById("installModal").style.display = "none";
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.then(() => {
+        deferredPrompt = null;
+      });
+    });
+  </script>
+</body>
+</html>
