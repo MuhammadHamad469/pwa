@@ -1,93 +1,545 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>My PWA</title>
+  <meta name="theme-color" content="#0a0a0f">
+  <meta name="description" content="PWA Test App — install and experience the future.">
+  <title>MyApp — Install Experience</title>
   <link rel="manifest" href="manifest.json">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+
   <style>
-    /* Center Modal Popup */
+    :root {
+      --bg: #0a0a0f;
+      --surface: #12121a;
+      --surface2: #1c1c28;
+      --accent: #7b5ea7;
+      --accent2: #c084fc;
+      --neon: #a78bfa;
+      --text: #e2e0f0;
+      --muted: #6b6880;
+      --border: rgba(123, 94, 167, 0.25);
+      --glow: 0 0 40px rgba(167, 139, 250, 0.25);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'DM Mono', monospace;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* ── Animated background grid ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(123,94,167,0.06) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(123,94,167,0.06) 1px, transparent 1px);
+      background-size: 48px 48px;
+      z-index: 0;
+      animation: gridDrift 20s linear infinite;
+    }
+    @keyframes gridDrift {
+      0%   { background-position: 0 0; }
+      100% { background-position: 48px 48px; }
+    }
+
+    /* ── Glowing orb in background ── */
+    body::after {
+      content: '';
+      position: fixed;
+      width: 600px; height: 600px;
+      top: -150px; right: -150px;
+      background: radial-gradient(circle, rgba(124,58,237,0.18) 0%, transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 0;
+      animation: orbPulse 8s ease-in-out infinite;
+    }
+    @keyframes orbPulse {
+      0%, 100% { transform: scale(1); opacity: 0.6; }
+      50%       { transform: scale(1.15); opacity: 1; }
+    }
+
+    /* ── Main layout ── */
+    .page {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Header ── */
+    header {
+      padding: 28px 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(16px);
+      background: rgba(10,10,15,0.6);
+      position: sticky; top: 0; z-index: 10;
+      animation: slideDown 0.6s ease both;
+    }
+    @keyframes slideDown {
+      from { transform: translateY(-100%); opacity: 0; }
+      to   { transform: translateY(0); opacity: 1; }
+    }
+    .logo {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.3rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--text);
+    }
+    .logo span { color: var(--neon); }
+    .badge {
+      font-size: 0.65rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--neon);
+      border: 1px solid var(--border);
+      padding: 4px 12px;
+      border-radius: 100px;
+      background: rgba(167,139,250,0.08);
+    }
+
+    /* ── Hero ── */
+    .hero {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 80px 24px 60px;
+      gap: 24px;
+    }
+
+    .pill {
+      font-size: 0.7rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--neon);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(167,139,250,0.1);
+      border: 1px solid var(--border);
+      padding: 6px 16px;
+      border-radius: 100px;
+      animation: fadeUp 0.7s 0.2s ease both;
+    }
+    .pill::before {
+      content: '';
+      width: 6px; height: 6px;
+      background: var(--neon);
+      border-radius: 50%;
+      animation: blink 1.6s ease-in-out infinite;
+    }
+    @keyframes blink { 0%,100%{opacity:1;} 50%{opacity:0.2;} }
+
+    h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(2.6rem, 8vw, 5.5rem);
+      font-weight: 800;
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+      color: var(--text);
+      animation: fadeUp 0.7s 0.35s ease both;
+    }
+    h1 em {
+      font-style: normal;
+      background: linear-gradient(135deg, var(--accent2), var(--neon) 60%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .subtitle {
+      max-width: 480px;
+      font-size: 0.95rem;
+      line-height: 1.7;
+      color: var(--muted);
+      animation: fadeUp 0.7s 0.5s ease both;
+    }
+
+    /* ── Feature cards ── */
+    .features {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      max-width: 640px;
+      width: 100%;
+      animation: fadeUp 0.7s 0.65s ease both;
+    }
+    @media (max-width: 560px) { .features { grid-template-columns: 1fr; } }
+
+    .feature-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px 18px;
+      text-align: left;
+      transition: border-color 0.3s, box-shadow 0.3s, transform 0.3s;
+    }
+    .feature-card:hover {
+      border-color: rgba(167,139,250,0.6);
+      box-shadow: var(--glow);
+      transform: translateY(-3px);
+    }
+    .feature-icon {
+      font-size: 1.5rem;
+      margin-bottom: 10px;
+    }
+    .feature-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+    .feature-desc {
+      font-size: 0.72rem;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    /* ── Install CTA Button ── */
+    .cta-section {
+      animation: fadeUp 0.7s 0.8s ease both;
+    }
+    #manualInstallBtn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-family: 'Syne', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      background: linear-gradient(135deg, var(--accent) 0%, var(--neon) 100%);
+      color: #fff;
+      border: none;
+      padding: 16px 36px;
+      border-radius: 100px;
+      cursor: pointer;
+      position: relative;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 8px 32px rgba(124,58,237,0.4);
+    }
+    #manualInstallBtn:hover {
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 12px 40px rgba(124,58,237,0.55);
+    }
+    #manualInstallBtn:active { transform: scale(0.98); }
+
+    .hint {
+      margin-top: 12px;
+      font-size: 0.72rem;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── INSTALL MODAL ── */
     #installModal {
       display: none;
       position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.7);
+      inset: 0;
+      background: rgba(0,0,0,0.75);
+      backdrop-filter: blur(8px);
       z-index: 9999;
       justify-content: center;
       align-items: center;
+      padding: 20px;
     }
+    #installModal.show { display: flex; }
+
     #installBox {
-      background: white;
-      padding: 30px;
-      border-radius: 16px;
+      background: var(--surface);
+      border: 1px solid rgba(167,139,250,0.4);
+      border-radius: 24px;
+      padding: 40px 36px 32px;
+      max-width: 340px;
+      width: 100%;
       text-align: center;
-      max-width: 300px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-      animation: pop 0.3s ease-out;
+      position: relative;
+      box-shadow: 0 0 80px rgba(124,58,237,0.3), 0 32px 64px rgba(0,0,0,0.5);
+      animation: modalPop 0.35s cubic-bezier(0.34,1.56,0.64,1) both;
     }
-    @keyframes pop {
-      from { transform: scale(0.8); opacity: 0; }
-      to { transform: scale(1); opacity: 1; }
+    @keyframes modalPop {
+      from { transform: scale(0.75) translateY(20px); opacity: 0; }
+      to   { transform: scale(1) translateY(0); opacity: 1; }
     }
-    #installBtn {
-      background: #007bff;
-      color: white;
-      border: none;
-      padding: 12px 30px;
-      font-size: 18px;
-      border-radius: 8px;
-      margin-top: 15px;
-      cursor: pointer;
-    }
-    .closeBtn {
-      background: none;
-      border: none;
-      font-size: 28px;
+
+    .modal-close {
       position: absolute;
-      top: 10px;
-      right: 15px;
+      top: 14px; right: 18px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 18px;
+      line-height: 1;
+      width: 32px; height: 32px;
+      border-radius: 50%;
       cursor: pointer;
-      color: #999;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.2s, color 0.2s;
+    }
+    .modal-close:hover { background: rgba(255,255,255,0.1); color: var(--text); }
+
+    .modal-icon {
+      width: 72px; height: 72px;
+      border-radius: 20px;
+      margin: 0 auto 20px;
+      display: block;
+      border: 2px solid var(--border);
+      box-shadow: 0 8px 24px rgba(124,58,237,0.35);
+      object-fit: cover;
+      background: var(--surface2);
+    }
+
+    .modal-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 8px;
+      color: var(--text);
+    }
+
+    .modal-subtitle {
+      font-size: 0.82rem;
+      color: var(--muted);
+      line-height: 1.6;
+      margin-bottom: 28px;
+    }
+
+    .modal-steps {
+      list-style: none;
+      text-align: left;
+      margin-bottom: 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .modal-steps li {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+    .step-num {
+      width: 22px; height: 22px;
+      border-radius: 50%;
+      background: rgba(167,139,250,0.15);
+      border: 1px solid var(--border);
+      color: var(--neon);
+      font-size: 0.7rem;
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+
+    #installBtn {
+      width: 100%;
+      font-family: 'Syne', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--accent), var(--neon));
+      color: #fff;
+      border: none;
+      padding: 14px 24px;
+      border-radius: 14px;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      box-shadow: 0 4px 20px rgba(124,58,237,0.4);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    #installBtn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 28px rgba(124,58,237,0.55);
+    }
+    #installBtn:active { transform: scale(0.98); }
+
+    /* ── Divider ── */
+    .modal-divider {
+      display: flex; align-items: center; gap: 10px;
+      margin: 14px 0 14px;
+      color: var(--muted); font-size: 0.7rem;
+    }
+    .modal-divider::before, .modal-divider::after {
+      content: ''; flex: 1; height: 1px; background: var(--border);
+    }
+
+    /* ── Installed state ── */
+    #installedBanner {
+      display: none;
+      margin-top: 12px;
+      font-size: 0.78rem;
+      color: #4ade80;
+      text-align: center;
+    }
+
+    /* ── Footer ── */
+    footer {
+      text-align: center;
+      padding: 24px;
+      font-size: 0.68rem;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+      border-top: 1px solid var(--border);
+      position: relative; z-index: 1;
     }
   </style>
 </head>
 <body>
-  <h1>Hello PWA</h1>
-  <p>Open on your phone → you will see a beautiful center popup!</p>
+  <div class="page">
 
-  <!-- Center Modal Install Popup -->
-  <div id="installModal">
+    <!-- Header -->
+    <header>
+      <div class="logo">My<span>App</span></div>
+      <span class="badge">PWA · v1.0</span>
+    </header>
+
+    <!-- Hero -->
+    <main class="hero">
+      <div class="pill">Now available — install for free</div>
+
+      <h1>The app that<br>lives on your<br><em>home screen</em></h1>
+
+      <p class="subtitle">
+        Fast, offline-ready, and always available — even without a network connection. Install once and forget the browser.
+      </p>
+
+      <!-- Feature grid -->
+      <div class="features">
+        <div class="feature-card">
+          <div class="feature-icon">⚡</div>
+          <div class="feature-title">Instant Load</div>
+          <div class="feature-desc">Cached assets serve in milliseconds.</div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">📡</div>
+          <div class="feature-title">Offline Ready</div>
+          <div class="feature-desc">Works even without internet access.</div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🏠</div>
+          <div class="feature-title">Home Screen</div>
+          <div class="feature-desc">Installs like a native app, no store needed.</div>
+        </div>
+      </div>
+
+      <!-- CTA -->
+      <div class="cta-section">
+        <button id="manualInstallBtn">
+          ⬇ Install App
+        </button>
+        <p class="hint">No app store required · Free · Lightweight</p>
+      </div>
+    </main>
+
+    <footer>© 2025 MyApp · Built with love as a PWA</footer>
+  </div>
+
+  <!-- ── Install Modal ── -->
+  <div id="installModal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
     <div id="installBox">
-      <button class="closeBtn" onclick="document.getElementById('installModal').style.display='none'">×</button>
-      <img src="/download.jpeg" width="80" height="80" style="border-radius:12px; margin-bottom:15px;">
-      <h3>Install My PWA</h3>
-      <p>Add this app to your home screen?</p>
-      <button id="installBtn">Install App</button>
+      <button class="modal-close" id="closeModal" aria-label="Close">×</button>
+
+      <img class="modal-icon" src="icons/icon-192.png" alt="App Icon" onerror="this.style.background='#1c1c28'; this.removeAttribute('src')">
+
+      <div class="modal-title" id="modal-title">Install MyApp</div>
+      <div class="modal-subtitle">Add to your home screen for the full experience — fast, offline-ready, and always one tap away.</div>
+
+      <ul class="modal-steps">
+        <li><span class="step-num">1</span> Tap the button below</li>
+        <li><span class="step-num">2</span> Confirm the system prompt</li>
+        <li><span class="step-num">3</span> Find the app on your home screen</li>
+      </ul>
+
+      <button id="installBtn">⬇ &nbsp;Install Now</button>
+
+      <div class="modal-divider">or</div>
+
+      <div id="installedBanner">✓ &nbsp;App installed successfully!</div>
+      <div style="font-size:0.7rem; color: var(--muted); text-align:center; margin-top:4px;">
+        On iOS: use Safari → Share → Add to Home Screen
+      </div>
     </div>
   </div>
 
   <script>
-    let deferredPrompt;
-
-    // Register Service Worker
+    // ── Service Worker ──
     if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("service-worker.js");
+      navigator.serviceWorker.register("service-worker.js")
+        .then(r => console.log("SW registered", r.scope))
+        .catch(e => console.warn("SW failed", e));
     }
 
-    // When browser is ready to show install prompt
+    // ── Install prompt logic ──
+    let deferredPrompt = null;
+
     window.addEventListener("beforeinstallprompt", (e) => {
       e.preventDefault();
       deferredPrompt = e;
-      document.getElementById("installModal").style.display = "flex"; // Show center modal
     });
 
-    // Install button
-    document.getElementById("installBtn").addEventListener("click", () => {
-      document.getElementById("installModal").style.display = "none";
+    function openModal() {
+      document.getElementById("installModal").classList.add("show");
+    }
+
+    function closeModal() {
+      document.getElementById("installModal").classList.remove("show");
+    }
+
+    document.getElementById("manualInstallBtn").addEventListener("click", openModal);
+    document.getElementById("closeModal").addEventListener("click", closeModal);
+    document.getElementById("installModal").addEventListener("click", (e) => {
+      if (e.target === document.getElementById("installModal")) closeModal();
+    });
+
+    document.getElementById("installBtn").addEventListener("click", async () => {
+      if (!deferredPrompt) {
+        // If no prompt (already installed, or iOS), show hint
+        document.getElementById("installedBanner").style.display = "block";
+        document.getElementById("installedBanner").textContent = "ℹ On iOS: Share → Add to Home Screen";
+        return;
+      }
       deferredPrompt.prompt();
-      deferredPrompt.userChoice.then(() => {
-        deferredPrompt = null;
-      });
+      const { outcome } = await deferredPrompt.userChoice;
+      deferredPrompt = null;
+      if (outcome === "accepted") {
+        document.getElementById("installBtn").textContent = "✓ Installed!";
+        document.getElementById("installBtn").style.background = "linear-gradient(135deg,#16a34a,#4ade80)";
+        document.getElementById("installedBanner").style.display = "block";
+        document.getElementById("installedBanner").textContent = "✓ App installed successfully!";
+        setTimeout(closeModal, 2000);
+      }
+    });
+
+    // Auto-show modal on prompt available (optional)
+    window.addEventListener("beforeinstallprompt", () => {
+      // Uncomment below to auto-open modal when browser is ready:
+      // openModal();
     });
   </script>
 </body>
